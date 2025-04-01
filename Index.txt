@@ -1,0 +1,79 @@
+const express=require('express'); const app = express();
+constmongoose=require('mongoose');
+ 
+const adminhandler = require('./admin/adminHandler'); const taskHandler = require('./task/TaskController');
+const empHandler = require('./employee/employeeHandler'); const projectHandler = require('./project/projectController'); const otherdataController = require('./otherdata/otherdataContr') const cors = require('cors');
+constempSchema=require('./employee/employeeSchema')
+
+
+app.use(express.json()); app.use(cors())
+
+//createadmin
+app.post('/taskmanger/inns/api/admin/createAdmin',adminhandler.postAdmin);
+//loginadmin
+app.post('/taskmanger/inns/api/admin/loginadmin',adminhandler.loginAdmin);
+
+
+//addtask
+app.post('/taskmanger/inns/api/task/addTask',taskHandler.addTask);
+//viewtask
+app.get('/taskmanger/inns/api/task/viewAllTask', taskHandler.viewAllTask); app.get('/taskmanger/inns/api/task/viewOneTask',taskHandler.viewOneTask);
+//updatetask
+app.patch('/taskmanger/inns/api/task/updateTask',taskHandler.updateTask);
+//getcountofcompletedtask
+app.get('/taskmanger/inns/api/task/countOfCompSts',taskHandler.countOfCompSts);
+//get task foremp
+app.get('/taskmanager/api/employee/getTaskForEmp',taskHandler.getTaskForEMp)
+
+
+//emp
+ 
+app.post('/taskmanager/inns/api/employee/create',empHandler.postEmployee); app.post('/taskmanager/inns/api/employee/login',empHandler.postempLogin);
+//viewoneempdata
+app.get('/taskmanger/inns/api/employee/viewOneEmp',empHandler.viewOneEmp);
+// getEmp username &Emprole app.get('/taskmanager/api/employee/getUsername',empHandler.getUsername);
+//getfn& lnofEmp
+// app.get('/taskmanager/api/employee/getNameOfEmp',empHandler.getNameOfEmp);
+//getcountofEmp
+app.get('/taskmanager/api/employee/getCountOfEmp',empHandler.countOfEmp);
+//updateemp profile
+app.patch('/taskmanager/api/employee/updateEmpProfile',empHandler.updateEmp);
+
+
+//addproject
+app.post('/taskmanger/inns/api/project/addProject',projectHandler.addProject);
+//viewproject
+app.get('/taskmanger/inns/api/project/viewAllProject', projectHandler.viewAllProject); app.get('/taskmanger/inns/api/project/viewOneProject', projectHandler.viewOneProject);
+//getempnameinoneproject
+app.get('/taskmanger/inns/api/project/getEmpInPro',projectHandler.getEmpInPro);
+//getcountofproject
+app.get('/taskmanager/api/project/getCountOfPro',projectHandler.countOfProject);
+//getdeadlineforproject
+app.get('/taskmanager/api/project/getDeadline',projectHandler.getDateOfDeadLine);
+//updateproject
+app.patch('/taskmanager/api/project/updateProject',projectHandler.updateProject);
+// getEmp project &Empname in projects app.get('/taskmanager/api/employee/getProjectname',projectHandler.getProjectname);
+//getprojforemp====needtopassquery
+ 
+app.get('/taskmanager/api/employee/getProjForEmp',projectHandler.getProjForEMp)
+
+
+
+// otherdata (sector, app type, tech, s/w) app.get('/taskmanger/inns/api/otherdata/getDataInOtherData',otherdataController.viewOtherData)
+
+app.listen(3012,'127.0.0.1',()=>{
+console.log('serverstarted.');
+})
+
+mongoose.connect('mongodb://127.0.0.1:27017/TaskManager',
+//{useNewUrlParser:true,useUnifiedTopology:true}
+)
+.then(()=>{
+returnempSchema.collection.dropIndex('userRole_1');
+})
+.then(()=>{
+console.log('UniqueindexonuserRolefielddroppedsuccessfully'); console.log('db connected')
+})
+.catch((error)=> {
+console.log('Errordroppinguniqueindex:',error);
+});
