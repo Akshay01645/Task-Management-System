@@ -1,0 +1,103 @@
+import{useState}from'react';
+import{useNavigate}from'react-router-dom'; import axios from 'axios';
+
+import'./AdminLogin.css';
+
+
+functionAdminLogin(){
+const[loginData,setLoginData]=useState({ username : "",
+password:""
+});
+const[err1,setErr1]=useState({}); const [err2, setErr2] = useState("") , const navigate = useNavigate()
+
+constchangeLogin=(e)=>{
+setLoginData({...loginData,[e.target.name]:e.target.value});
+}
+
+constvalidateAdminLogin=(loginData)=>{ let err1 = {}
+if(loginData.username===""){
+err1.ErrLogin="Pleaseenterusername"
+}
+ 
+else if(loginData.password === ""){ err1.ErrLogin="Pleaseenterpassword"
+}
+
+
+returnerr1;
+}
+
+
+constsubmitLogin=(e)=>{ e.preventDefault();
+console.log(loginData);
+const errors =validateAdminLogin(loginData); if (Object.keys(errors).length === 0) {
+
+axios.post(`http://127.0.0.1:3012/taskmanger/inns/api/admin/loginadmin?username=${loginDat a.username}`, JSON.stringify(loginData), {
+headers:{
+"Content-Type":"application/json"
+}
+}).then((res) => { console.log(res.data); navigate('/adminDashboard');
+}).catch((err)=>{
+if (err.response&&err.response.data&&err.response.data.message) { setErr1({ backend: err.response.data.message });
+}else{
+setErr1({backend:"Anerroroccurred.Pleasetryagainlater."});
+}
+});
+}else{
+ 
+setErr1(errors);
+}
+}
+
+
+return(
+<divclassName='adminTotal'>
+<div id="total">
+<divclassName="container">
+<divclassName="screen">
+<divclassName="screencontent">
+<h1>AdminLog<span>in</span></h1>
+<formclassName="login">
+<divclassName="loginfield">
+<iclassName="loginiconfasfa-user"></i>
+<inputtype="text"className="logininput"placeholder="Username/Email"name='username' value={loginData.username} onChange={changeLogin}/>
+</div>
+<divclassName="loginfield">
+<iclassName="loginiconfasfa-lock"></i>
+<inputtype="password"className="logininput"placeholder="Password"name='password' value={loginData.password} onChange={changeLogin}/>
+</div>
+<p>{err1.ErrLogin}</p>
+<p>{err1.backend}</p>
+<buttonclassName="buttonloginsubmit"onClick={submitLogin}>
+<spanclassName="buttontext">LogInNow</span>
+<iclassName="buttonicon fasfa-chevron-right"></i>
+</button>
+</form>
+ 
+<divclassName="social-login">
+<h3>loginvia</h3>
+<divclassName="social-icons">
+<ahref="#"className="social-loginiconfabfa-instagram"></a>
+<ahref="#"className="social-loginiconfabfa-facebook"></a>
+<ahref="#"className="social-loginiconfabfa-twitter"></a>
+</div>
+</div>
+</div>
+<divclassName="screenbackground">
+<spanclassName="screenbackgroundshapescreenbackgroundshape4"></span>
+<spanclassName="screenbackgroundshapescreenbackgroundshape3"></span>
+
+
+<spanclassName="screenbackgroundshapescreenbackgroundshape2"></span>
+<spanclassName="screenbackgroundshapescreenbackgroundshape1"></span>
+</div>
+</div>
+</div>
+
+
+</div>
+
+
+</div>
+)
+}
+exportdefaultAdminLogin;
