@@ -1,0 +1,276 @@
+importReact,{useEffect,useState}from"react"; import './AdminDashboard.css';
+importNavbarfrom'../AdminNavBar/Nav' import Barchart from '../charts/barChart' import Piechart from "../charts/pieChart"; import axios from 'axios';
+import award1 from '../assets/award1.jfif'; import award2 from '../assets/award2.jfif'; import award3 from '../assets/award3.png'; import award4 from '../assets/award4.jfif'; import india from '../assets/india.png';import france from '../assets/france.png'; importgermanyfrom'../assets/germany.png'; import uk from '../assets/uk.png';
+importPropTypesfrom'prop-types';
+importSlider,{SliderThumb}from'@mui/material/Slider'; import { styled } from '@mui/material/styles';
+import{Progress, ButtonGroup,Button,Row,Col}from'rsuite';
+
+
+
+import{FontAwesomeIcon} from'@fortawesome/react-fontawesome';
+import{faUserPen,faCheck,faHeartCircleCheck,faArrowTrendUp}from'@fortawesome/free-solid- svg-icons';
+import{useNavigate} from"react-router-dom";
+ 
+
+
+functionAdminDashBoard(){
+const[getCountOfEmp , setGetCountOfEmp] = useState(0); const[getCountOfProject , setGetCountOfProject] = useState(0); const[getCountOfCompTask,setGetCountOfCompTask]=useState(0); const[getCountOfPendTask , setGetCountOfPendTask] = useState(0);
+const[percent,setPercent]=React.useState(0); const [status, setStatus] = useState(null);
+constnavigate=useNavigate();
+const[popupProj,setPopupProj]=useState(false); const [viewProj, setViewproj] = useState([]); const [projectname, setProjectname] =useState(''); const [allProj, setAllProj] = useState([]);
+
+useEffect(()=>{
+setStatus((percent===100) ?'success':null);
+
+
+// count employee axios.get('http://127.0.0.1:3012/taskmanager/api/employee/getCountOfEmp',{ headers : {
+"Content-Type":"apllication/json"
+}
+}).then((res)=>{ console.log(res.data.getCount);
+setGetCountOfEmp(res.data.getCount);
+}).catch((err)=>{ console.log(err)
+})
+ 
+
+// count project axios.get('http://127.0.0.1:3012/taskmanager/api/project/getCountOfPro',{ headers : {
+"Content-Type":"apllication/json"
+}
+}).then((res)=>{ console.log(res.data.getCount);
+setGetCountOfProject(res.data.getCount);
+}).catch((err)=>{ console.log(err)
+});
+
+
+// get count of completed task axios.get('http://127.0.0.1:3012/taskmanger/inns/api/task/countOfCompSts?status=completed',{ headers : {
+"Content-Type":"apllication/json"
+}
+}).then((res)=>{ console.log(res.data.compStatus);
+setGetCountOfCompTask(res.data.compStatus);
+}).catch((err)=>{ console.log(err)
+});
+// get count of in process task axios.get('http://127.0.0.1:3012/taskmanger/inns/api/task/countOfCompSts?status=inprocess',{ headers : {
+"Content-Type":"apllication/json"
+}
+ 
+}).then((res)=>{
+// console.log(res.data.compStatus); setGetCountOfPendTask(res.data.compStatus);
+}).catch((err)=>{ console.log(err)
+});
+
+axios.get('http://127.0.0.1:3012/taskmanger/inns/api/project/viewAllProject',{ headers: {
+"Content-Type":"application/json"
+}
+}).then((res) => { console.log(res.data.viewProject)
+
+letprojects=res.data.viewProject;
+letprojectNames=projects.map(project=>project.projectname); setAllProj(projectNames);
+}).catch((err)=>{ console.log(err)
+})
+
+},[]);
+
+
+useEffect(()=>{
+
+
+},[viewProj])
+
+constpopupProject=async(projectname)=>{ try {
+ 
+const data = await axios.get(`http://127.0.0.1:3012/taskmanger/inns/api/project/viewOneProject?projectname=${projec tname}`,{
+headers:{
+"Content-Type":"application/json"
+}
+})
+setViewproj(data.data.viewProject[0]);
+}catch(error){
+console.error('Errorprojectgetting',error);
+}
+(popupProj===false)?setPopupProj(true):setPopupProj(false);
+}
+
+
+constclosePopupProj=()=>{ setPopupProj(false)
+}
+
+
+return(
+<divclassName="totalDashBoardDivadminDashbaord">
+<divclassName="navDiv" id='navDiv'>
+<Navbar />
+</div>
+<divclassName="content-wrapperadmn-dshbrd-wraper"id='content-wrapper'>
+<divclassName="contentcontent-boxes">
+<!-- <divclassName={(popupProj== true)?'active':'deactive'}> -->
+    <div className={popupProj ? 'active' : 'deactive'}>
+
+<divclassName="contentActive">
+<bid="closeActive"onClick={closePopupProj}>&times;</b>
+<h1>{viewProj.projectname}</h1>
+ 
+<div>
+<p><span>description:</span>{viewProj.description}</p>
+<p><span>assignedDate:</span>{viewProj.assignedDate}</p>
+<p><span>deadline:</span>{viewProj.deadline}</p>
+<p><span>applicationType:</span>{viewProj.applicationType}</p>
+<p><span>sector:</span>{viewProj.sector}</p>
+<p><span>status:</span>{viewProj.status}</p>
+<p><span>budget:</span>{viewProj.budget}</p>
+<p><span>manager:</span>{viewProj.manager}</p>
+<p><span>teamLeader:</span>{viewProj.teamLeader}</p>
+<p><span>technologies:</span>{viewProj.technologies}</p>
+<p><span>tasks:</span>{viewProj.tasks}</p>
+<p><span>employeesToAdd:</span>{viewProj.employeesToAdd}</p>
+<p><span>softwareUsing:</span>{viewProj.softwareUsing}</p>
+</div>
+</div>
+</div>
+<divclassName='content-box3content-box-common'id='contbox7'onClick={()=>navigate('/ListOfEmp')}>
+<p>Noofemployeesjoined</p>
+<h1><FontAwesomeIcon icon={faUserPen} style={{width:"35px"}}/> {5050+getCountOfEmp}</h1>till date
+</div>
+<divclassName='content-box4content-box-common'id='contbox8'>
+<p>Taskstatus</p>
+<divclassName="loaderPercent">
+<divstyle={{width:40}}>
+<Progress.Circle percent={getCountOfCompTask*10} strokeColor={'#59e90c'} strokeWidth={10} status={status} trailColor="#9b9999" trailWidth={10}/>
+ 
+</div>
+<div>
+<pstyle={{color:'#59e90c'}}>Completed</p>
+<pstyle={{color:'#3385ff'}}>inprocess</p>
+</div>
+<divstyle={{width:40}}>
+<Progress.Circle percent={getCountOfPendTask*10} strokeColor={'#3385ff'} strokeWidth={10} status={status} trailColor="grey" trailWidth={10}/>
+</div>
+</div>
+</div>
+<divclassName='content-box5content-box-common'id='contbox9'>
+<p>Noofprojectscompleted</p>
+<h1>
+<FontAwesomeIconicon={faCheck}id="faCheck"/>
+{2780+getCountOfProject}</h1>tilldate
+</div>
+<divclassName='content-box6content-box-common'id='contbox10'>
+<h1>Time&Budget</h1>
+<ul>
+<span>
+<li><span></span>March</li>
+<li><span></span>June</li>
+</span>
+<span>
+<li><span></span>5Cr</li>
+<li><span></span>20Cr</li>
+</span>
+</ul>
+ 
+</div>
+<divclassName='content-box1content-box-common'id='contbox1'>
+<divclassName="boxInBox">
+<Piechart />
+</div>
+<divclassName="boxInBox">
+<divonClick={()=>popupProject(allProj[0])}>
+<span></span><b>projectAin2019</b>
+</div>
+<divonClick={()=>popupProject(allProj[1])}>
+<span></span><b>projectBin2019</b>
+</div>
+<divonClick={()=>popupProject(allProj[2])}>
+<span></span><b>projectCin2020</b>
+</div>
+<divonClick={()=>popupProject(allProj[3])}>
+<span></span><b>projectDin2020</b>
+</div>
+<divonClick={()=>popupProject(allProj[4])}>
+<span></span><b>projectEin2021</b>
+</div>
+<divonClick={()=>popupProject(allProj[0])}>
+<span></span><b>projectFin2021</b>
+</div>
+<divonClick={()=>popupProject(allProj[1])}>
+<span></span><b>projectGin2022</b>
+</div>
+<divonClick={()=>popupProject(allProj[2])}>
+<span></span><b>projectHin2022</b>
+ 
+</div>
+<divonClick={()=>popupProject(allProj[3])}>
+<span></span><b>projectIin2023</b>
+</div>
+<divonClick={()=>popupProject(allProj[4])}>
+<span></span><b>projectJin2023</b>
+</div>
+<divonClick={()=>popupProject(allProj[0])}>
+<span></span><b>projectKin2024</b>
+</div>
+</div>
+</div>
+<divclassName='content-box2content-box-common'id='contbox2'>
+<div>
+<h3>Companygrowth</h3>
+</div>
+<divclassName="percent">
+<h4>profitPercentage</h4>
+</div>
+<Barchart/>
+</div>
+<divclassName='content-box3content-box-common'id='contbox3'>
+<h1>Awards</h1>
+<div>
+<spanclassName="awardsCont">
+<imgsrc={award1}alt=""width={'40px'}height={'40px'}/>
+<span>
+BestCompanyin2020
+</span>
+ 
+</span>
+<spanclassName="awardsCont">
+<imgsrc={award2}alt=""width={'40px'}height={'40px'}/>
+<span>
+BestCompanyin2018
+</span>
+</span>
+<spanclassName="awardsCont">
+<imgsrc={award3}alt=""width={'40px'}height={'40px'}/>
+<span>
+BestCompanyin2020
+</span>
+</span>
+<spanclassName="awardsCont">
+<imgsrc={award4}alt=""width={'40px'}height={'40px'}/>
+<span>
+BestCompanyin2023
+</span>
+</span>
+</div>
+</div>
+<divclassName='content-box4content-box-common'id='contbox4'>
+<p>clientsfeedback</p>
+<h1>4.8<FontAwesomeIconicon={faHeartCircleCheck}id="heartbeatIcon"/></h1>
+</div>
+<divclassName='content-box5content-box-common'id='contbox5'>
+<h1>Countries</h1>
+<ul>
+<span>
+ 
+<li><imgsrc={india}alt=""width={'30px'}height={'20px'}/>India</li>
+<li><imgsrc={france}alt=""width={'30px'}height={'20px'}/>France</li>
+</span>
+<span>
+<li><imgsrc={germany}alt=""width={'30px'}height={'20px'}/>Germany</li>
+<li><imgsrc={uk}alt=""width={'30px'}height={'20px'}/>UK</li>
+</span>
+</ul>
+</div>
+<divclassName='content-box6content-box-common'id='contbox6'>
+<p>CompanyValue</p>
+<h3><FontAwesomeIconicon={faArrowTrendUp}id="faCaretUp"/></h3>$<h3>1.3M</h3>
+</div>
+</div>
+</div>
+</div>
+)
+}
+exportdefaultAdminDashBoard;
+
